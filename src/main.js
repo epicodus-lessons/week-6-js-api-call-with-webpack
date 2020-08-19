@@ -24,18 +24,9 @@ $(document).ready(function() {
   $('#weatherLocation').click(function() {
     let city = $('#location').val();
     clearFields();
-    let promise = WeatherService.getWeather(city);
-    promise.then(function(response) {
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .catch(function(error) {
-      return error;
-    })
-    .then(function(jsonifiedResponse) {
-      getElements(jsonifiedResponse);
-    });
+    WeatherService.getWeather(city)
+      .then(function(response) {
+        getElements(response);
+      });
   });
 });
