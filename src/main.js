@@ -2,33 +2,40 @@ import $ from 'jquery';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/styles.css';
-import WeatherService from './weather-service.js';
+import WeatherService from './services/weather-service.js';
+import GiphyService from './services/giphy-service';
 
 function clearFields() {
   $('#location').val("");
-  $('.showErrors').text("");
-  $('.showHumidity').text("");
-  $('.showTemp').text("");
+  $('.show-errors').text("");
+  $('.show-gif').text("");
 }
 
-function getElements(response) {
-  if (response.main) {
-    $('.showHumidity').text(`The humidity in ${response.name} is ${response.main.humidity}%`);
-    $('.showTemp').text(`The temperature in Kelvins is ${response.main.temp} degrees.`);
+function displayWeatherDescription(description) {
+  $('.weather-description').text(`The weather is ${description}!`);
+}
+
+function displayGif(response) {
+  if (response.data) {
+    const url = response.data[0].images.downsized.url
+    $('.show-gif').html(`<img src='${url}'>`);
   } else {
-    $('.showErrors').text(`There was an error: ${response}`);
+    $('.show-errors').text(`There was an error: ${response}`);
   }
-}
-
-async function makeApiCall(city) {
-  const response = await WeatherService.getWeather(city);
-  getElements(response);
 }
 
 $(document).ready(function() {
   $('#weatherLocation').click(function() {
     let city = $('#location').val();
     clearFields();
-    makeApiCall(city);
+    WeatherService.getWeather(city)
+      .then(function(response) {
+        const weatherDescription = response.weather[0].description;
+        displayWeatherDescription(weatherDescription);
+        return GiphyService.getGif(weatherDescription);
+      })
+      .then(function(giphyResponse) {
+        displayGif(giphyResponse);
+      })
   });
 });
