@@ -16,12 +16,12 @@ function displayWeatherDescription(description) {
 }
 
 function displayGif(response) {
-  if (response.data) {
-    const url = response.data[0].images.downsized.url
-    $('.show-gif').html(`<img src='${url}'>`);
-  } else {
-    $('.show-errors').text(`There was an error: ${response}`);
-  }
+  const url = response.data[0].images.downsized.url
+  $('.show-gif').html(`<img src='${url}'>`);
+}
+
+function displayErrors(error) {
+  $('.show-errors').text(`${error}`);
 }
 
 $(document).ready(function() {
@@ -29,13 +29,22 @@ $(document).ready(function() {
     let city = $('#location').val();
     clearFields();
     WeatherService.getWeather(city)
-      .then(function(response) {
-        const weatherDescription = response.weather[0].description;
+      .then(function(weatherResponse) {
+        if (weatherResponse instanceof Error) {
+          throw Error(`OpenWeather API error: ${weatherResponse.message}`);
+        }
+        const weatherDescription = weatherResponse.weather[0].description;
         displayWeatherDescription(weatherDescription);
         return GiphyService.getGif(weatherDescription);
       })
       .then(function(giphyResponse) {
+        if (giphyResponse instanceof Error) {
+          throw Error(`Giphy API error: ${giphyResponse.message}`);
+        }
         displayGif(giphyResponse);
+      })
+      .catch(function(error) {
+        displayErrors(error.message)
       })
   });
 });

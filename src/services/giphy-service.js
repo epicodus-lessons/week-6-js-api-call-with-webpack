@@ -3,12 +3,12 @@ export default class GiphyService {
     return fetch(`http://api.giphy.com/v1/gifs/search?q=${query}&api_key=${process.env.GIPHY_API_KEY}&limit=5`)
       .then(function(response) {
       if (!response.ok) {
-        throw Error(response.statusText);
+        throw Error(response.status);
       }
       return response.json();
     })
     .catch(function(error) {
-      return error;
+      return Error(error);
     }) 
   }
 }
