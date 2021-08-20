@@ -4,14 +4,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/styles.css';
 
 // Business Logic
-function getWeather(city, callback) {
+function getWeather(city, handleResponse) {
   let request = new XMLHttpRequest();
   const url = `http://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.API_KEY}`;
 
   request.onreadystatechange = function() {
     if (this.readyState === 4 && this.status === 200) {
       const response = JSON.parse(this.responseText);
-      callback(response, city);
+      handleResponse(response, city);
     }
   }
   request.open("GET", url, true);
